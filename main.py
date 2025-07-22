@@ -499,7 +499,7 @@ def main():
 
 if __name__ == "__main__":
     main()
-'''
+
 #----------------------------------------------------------------------
 import cv2
 import pytesseract
@@ -535,7 +535,7 @@ def main():
 if __name__ == "__main__":
     main()
 #-----------------------------------------------------------------
-'''
+
 import cv2
 import pytesseract
 
@@ -569,3 +569,36 @@ def main():
 if __name__ == "__main__":
     main()
     '''
+
+#-------------------------------------------------------------------------------------
+import cv2
+import pytesseract
+
+# Path to your grayscale image
+IMAGE_PATH = "marked_image_gray_scale_version.png"
+
+# Load the grayscale image
+img = cv2.imread(IMAGE_PATH, cv2.IMREAD_GRAYSCALE)
+if img is None:
+    raise Exception("Failed to read image; check path and filename.")
+
+# Optional: denoise and upscale
+img = cv2.fastNlMeansDenoising(img, None, 5, 7, 11)
+
+img = cv2.resize(img, None, fx=4, fy=4, interpolation=cv2.INTER_CUBIC)
+
+gaussian = cv2.GaussianBlur(img, (9, 9), 10.0)
+img = cv2.addWeighted(img, 1.2, gaussian, -0.2, 0)
+
+
+cv2.imshow("Processed Image", img)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+# OCR extraction
+config = (r'--oem 1 --psm 6 -l eng -c tessedit_char_whitelist=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789./+*-: ')
+extracted_text = pytesseract.image_to_string(img, config=config)
+extracted_text = extracted_text.replace('Fs.', 'Rs.').replace('MEG', 'MFG')
+print("Extracted Text:")
+print(extracted_text.strip())
+
